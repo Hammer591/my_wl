@@ -103,6 +103,7 @@ class LeggedRobot(BaseTask):
             self.torques = self._compute_torques(
                 self.action_fifo[torch.arange(self.num_envs), self.action_delay_idx, :]
             ).view(self.torques.shape)
+            # print(self.torques)
             self.gym.set_dof_actuation_force_tensor(
                 self.sim, gymtorch.unwrap_tensor(self.torques)
             )

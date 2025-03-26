@@ -40,7 +40,19 @@ from .wheel_legged_vmc_flat.wheel_legged_vmc_flat_config import (
     WheelLeggedVMCFlatCfg,
     WheelLeggedVMCFlatCfgPPO,
 )
-
+from .my_wheel_legged.my_wheel_legged_config import (
+    MyWheelLeggedCfg,
+    MyWheelLeggedCfgPPO,
+)
+from .my_wheel_legged_vmc.my_wheel_legged_vmc import LeggedRobotVMC
+from .my_wheel_legged_vmc.my_wheel_legged_vmc_config import (
+    MyWheelLeggedVMCCfg,
+    MyWheelLeggedVMCCfgPPO,
+)
+from .my_wheel_legged_vmc_flat.my_wheel_legged_vmc_flat_config import (
+    MyWheelLeggedVMCFlatCfg,
+    MyWheelLeggedVMCFlatCfgPPO,
+)
 
 import os
 
@@ -57,4 +69,23 @@ task_registry.register(
     LeggedRobotVMC,
     WheelLeggedVMCFlatCfg(),
     WheelLeggedVMCFlatCfgPPO(),
+)
+
+task_registry.register(
+    "my_wheel_legged", 
+    LeggedRobot, 
+    MyWheelLeggedCfg(), 
+    MyWheelLeggedCfgPPO()
+)
+task_registry.register(
+    "my_wheel_legged_vmc", 
+    LeggedRobotVMC, 
+    MyWheelLeggedVMCCfg(), 
+    MyWheelLeggedVMCCfgPPO()
+)
+task_registry.register(
+    "my_wheel_legged_vmc_flat",
+    LeggedRobotVMC,
+    MyWheelLeggedVMCFlatCfg(),
+    MyWheelLeggedVMCFlatCfgPPO(),
 )

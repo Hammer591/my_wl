@@ -1,32 +1,3 @@
-# SPDX-FileCopyrightText: Copyright (c) 2021 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: BSD-3-Clause
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-# 1. Redistributions of source code must retain the above copyright notice, this
-# list of conditions and the following disclaimer.
-#
-# 2. Redistributions in binary form must reproduce the above copyright notice,
-# this list of conditions and the following disclaimer in the documentation
-# and/or other materials provided with the distribution.
-#
-# 3. Neither the name of the copyright holder nor the names of its
-# contributors may be used to endorse or promote products derived from
-# this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
-# Copyright (c) 2021 ETH Zurich, Nikita Rudin
 
 from wheel_legged_gym import WHEEL_LEGGED_GYM_ROOT_DIR, envs
 from time import time
@@ -50,12 +21,12 @@ from wheel_legged_gym.utils.math import (
     torch_rand_sqrt_float,
 )
 from wheel_legged_gym.utils.helpers import class_to_dict
-from .wheel_legged_vmc_config import WheelLeggedVMCCfg
+from .my_wheel_legged_vmc_config import MyWheelLeggedVMCCfg
 
 
 class LeggedRobotVMC(LeggedRobot):
     def __init__(
-        self, cfg: WheelLeggedVMCCfg, sim_params, physics_engine, sim_device, headless
+        self, cfg: MyWheelLeggedVMCCfg, sim_params, physics_engine, sim_device, headless
     ):
         """Parses the provided config file,
             calls create_sim() (which creates, simulation, terrain and environments),
@@ -92,7 +63,6 @@ class LeggedRobotVMC(LeggedRobot):
             self.torques = self._compute_torques(
                 self.action_fifo[torch.arange(self.num_envs), self.action_delay_idx, :]
             ).view(self.torques.shape)
-            # print(self.torques)
             self.gym.set_dof_actuation_force_tensor(
                 self.sim, gymtorch.unwrap_tensor(self.torques)
             )
@@ -183,6 +153,11 @@ class LeggedRobotVMC(LeggedRobot):
         )
 
         self.L0, self.theta0 = self.forward_kinematics(self.theta1, self.theta2)
+
+        print("self.theta1", self.theta1[0,:])
+        print("self.theta2", self.theta2[0,:])
+        print("self.L0", self.L0[0,:])
+        print("self.theta0", self.theta0[0,:])
 
         dt = 0.001
         L0_temp, theta0_temp = self.forward_kinematics(
@@ -285,6 +260,8 @@ class LeggedRobotVMC(LeggedRobot):
 
     def compute_proprioception_observations(self):
         # note that observation noise need to modified accordingly !!!
+        # print(" self.theta0", self.theta0)
+        # print(" self.L0", self.L0)
         obs_buf = torch.cat(
             (
                 # self.base_lin_vel * self.obs_scales.lin_vel,
@@ -303,10 +280,14 @@ class LeggedRobotVMC(LeggedRobot):
             ),
             dim=-1,
         )
+        print("base_quat", self.base_quat[0,:])
+        # print("obs_buf", obs_buf[0,:])
         return obs_buf
 
     def compute_observations(self):
         """Computes observations"""
+        # print("dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd")
+
         self.obs_buf = self.compute_proprioception_observations()
 
         if self.cfg.env.num_privileged_obs is not None:
@@ -347,7 +328,6 @@ class LeggedRobotVMC(LeggedRobot):
         self.obs_history = torch.cat(
             (self.obs_history[:, self.num_obs :], self.obs_buf), dim=-1
         )
-        print("        print(self.obs_history)",self.obs_history)
 
     def _compute_torques(self, actions):
         """Compute torques from actions.
@@ -398,6 +378,7 @@ class LeggedRobotVMC(LeggedRobot):
         self.torque_wheel = self.d_gains[:, [2, 5]] * (
             wheel_vel_ref - self.dof_vel[:, [2, 5]]
         )
+        # print("self.force_leg", self.force_leg[0,:])
         T1, T2 = self.VMC(
             self.force_leg + self.cfg.control.feedforward_force, self.torque_leg
         )
@@ -413,6 +394,7 @@ class LeggedRobotVMC(LeggedRobot):
             ),
             axis=1,
         )
+        print("torques", torques[0,:])
 
         return torch.clip(
             torques * self.torques_scale, -self.torque_limits, self.torque_limits

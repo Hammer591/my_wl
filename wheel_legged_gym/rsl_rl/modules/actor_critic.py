@@ -163,7 +163,7 @@ def get_activation(act_name):
     elif act_name == "selu":
         return nn.SELU()
     elif act_name == "relu":
-        return nn.ReLU()
+        return nn.ReLU() 
     elif act_name == "crelu":
         return nn.CReLU()
     elif act_name == "lrelu":

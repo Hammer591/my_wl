@@ -39,8 +39,8 @@ from wheel_legged_gym.utils import get_args, export_policy_as_jit, task_registry
 import numpy as np
 import torch
 
-
 def play(args):
+    count = 0
     env_cfg, train_cfg = task_registry.get_cfgs(name=args.task)
     # override some parameters for testing
     env_cfg.env.episode_length_s = 20
@@ -67,12 +67,29 @@ def play(args):
     # prepare environment
     env, _ = task_registry.make_env(name=args.task, args=args, env_cfg=env_cfg)
     obs, obs_history = env.get_observations()
+    # torch.set_printoptions(threshold=torch.inf)
+    # print("obs:", obs)
+    # print("obs_history:", obs_history)
     # load policy
     train_cfg.runner.resume = True
     ppo_runner, train_cfg = task_registry.make_alg_runner(
         env=env, name=args.task, args=args, train_cfg=train_cfg
     )
-    policy = ppo_runner.get_inference_policy(device=env.device)
+    # policy = ppo_runner.get_inference_policy(device=env.device)
+    model_path = os.path.join(
+            WHEEL_LEGGED_GYM_ROOT_DIR,
+            "logs",
+            train_cfg.runner.experiment_name,
+            "exported",
+            "policies",
+    )
+    policy_path_1 = os.path.join(model_path, 'policy_1.pt')
+    policy_model_1 = torch.jit.load(policy_path_1).to(env.device)
+    policy_model_1.eval()
+
+    policy_path_2 = os.path.join(model_path, 'policy_2.pt')
+    policy_model_2 = torch.jit.load(policy_path_2).to(env.device)
+    policy_model_2.eval()
 
     # export policy as a jit module (used to run it from C++)
     if EXPORT_POLICY:
@@ -102,19 +119,25 @@ def play(args):
     CoM_offset_compensate = True
     vel_err_intergral = torch.zeros(env.num_envs, device=env.device)
     vel_cmd = torch.zeros(env.num_envs, device=env.device)
-
     for i in range(1000 * int(env.max_episode_length)):
         if ppo_runner.alg.actor_critic.is_sequence:
-            actions, latent = policy(obs, obs_history)
+            # print("obs_history:", obs_history[0,:])
+            print("obs:", obs[0,:])
+            obs_history = obs_history.to(env.device)
+            latent = policy_model_2(obs_history)
+            input = torch.cat((obs, latent), dim=-1)
+            actions = policy_model_1(input)
+            # print("actions",actions[0,:])
+            # torch.set_printoptions(threshold=torch.inf)
+            # print("latent:", latent[0,:]/2)
         else:
-            actions = policy(obs.detach())
-
+            actions = policy_model_1(obs.detach())
         env.commands[:, 0] = 2.5
         env.commands[:, 2] = 0.18  # + 0.07 * np.sin(i * 0.01)
-        env.commands[:, 3] = 0
+        env.commands[:, 3] = 0.0
 
         if CoM_offset_compensate:
-            if i > 200 and i < 600:
+            if i > 0 and i < 2000:
                 vel_cmd[:] = 2.5 * np.clip((i - 200) * 0.05, 0, 1)
             else:
                 vel_cmd[:] = 0
@@ -124,9 +147,17 @@ def play(args):
                 * ((vel_cmd - env.base_lin_vel[:, 0]).abs() < 0.5)
             )
             vel_err_intergral = torch.clip(vel_err_intergral, -0.5, 0.5)
-            env.commands[:, 0] = vel_cmd + vel_err_intergral
+            env.commands[:, 0] = vel_cmd #+ vel_err_intergral
+        # print("env.commands:", env.commands)
 
         obs, _, rews, dones, infos, obs_history = env.step(actions)
+        # print("obs:", obs[0,:])
+
+        import time   
+        count += 1  
+        # if count == 2:   
+        #     time.sleep(100000000)
+
         if RECORD_FRAMES:
             if i % 2:
                 filename = os.path.join(
