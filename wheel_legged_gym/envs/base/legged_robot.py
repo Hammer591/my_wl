@@ -209,6 +209,8 @@ class LeggedRobot(BaseTask):
 
     def check_termination(self):
         """Check if environments need to be reset"""
+        # print("self.contact_forces[:, self.termination_contact_indices, :]",self.contact_forces[:, self.termination_contact_indices, :])
+        # print("self.contact_forces[:, self.termination_contact_indices, :],",self.contact_forces[0, :, :])
         fail_buf = torch.any(
             torch.norm(
                 self.contact_forces[:, self.termination_contact_indices, :], dim=-1
@@ -216,8 +218,8 @@ class LeggedRobot(BaseTask):
             > 10.0,
             dim=1,
         )
-        fail_buf |= self.projected_gravity[:, 2] > -0.1
-        self.fail_buf *= fail_buf
+        # fail_buf |= self.projected_gravity[:, 2] > -0.1
+        # self.fail_buf *= fail_buf
         self.fail_buf += fail_buf
         self.time_out_buf = (
             self.episode_length_buf > self.max_episode_length
@@ -228,7 +230,8 @@ class LeggedRobot(BaseTask):
             self.edge_reset_buf |= self.base_position[:, 1] > self.terrain_y_max - 1
             self.edge_reset_buf |= self.base_position[:, 1] < self.terrain_y_min + 1
         self.reset_buf = (
-            (self.fail_buf > self.cfg.env.fail_to_terminal_time_s / self.dt)
+            # (self.fail_buf > self.cfg.env.fail_to_terminal_time_s / self.dt)
+            (self.fail_buf )
             | self.time_out_buf
             | self.edge_reset_buf
         )
@@ -608,6 +611,7 @@ class LeggedRobot(BaseTask):
         if self.cfg.commands.heading_command:
             forward = quat_apply(self.base_quat, self.forward_vec)
             heading = torch.atan2(forward[:, 1], forward[:, 0])
+            # self.commands[:, 1] = torch.clip( 1.5 * wrap_to_pi(self.commands[:, 3] - heading), -5, 5) - torch.clip( 0.5 * self.base_ang_vel[:, 2] , -1, 1)
             self.commands[:, 1] = torch.clip(
                 1.5 * wrap_to_pi(self.commands[:, 3] - heading), -5, 5
             )
@@ -847,6 +851,8 @@ class LeggedRobot(BaseTask):
                 self.cfg.commands.advanced_max_curriculum,
             )
         if self.cfg.terrain.curriculum == False:
+            # print(self.episode_sums["tracking_lin_vel"][0])
+            # print(self.episode_sums["tracking_ang_vel"][0])
             if (
                 torch.mean(self.episode_sums["tracking_lin_vel"][env_ids])
                 / self.max_episode_length
@@ -1314,7 +1320,7 @@ class LeggedRobot(BaseTask):
         termination_contact_names = []
         for name in self.cfg.asset.terminate_after_contacts_on:
             termination_contact_names.extend([s for s in body_names if name in s])
-
+        # print("termination_contact_names",termination_contact_names)
         base_init_state_list = (
             self.cfg.init_state.pos
             + self.cfg.init_state.rot
@@ -1409,7 +1415,7 @@ class LeggedRobot(BaseTask):
             self.termination_contact_indices[i] = self.gym.find_actor_rigid_body_handle(
                 self.envs[0], self.actor_handles[0], termination_contact_names[i]
             )
-
+        # print("termination_contact_indices",self.termination_contact_indices)
     def _get_env_origins(self):
         """Sets environment origins. On rough terrain the origins are defined by the terrain platforms.
         Otherwise create a grid.
@@ -1750,6 +1756,7 @@ class LeggedRobot(BaseTask):
     def _reward_tracking_lin_vel(self):
         # Tracking of linear velocity commands (x axes)
         lin_vel_error = torch.square(self.commands[:, 0] - self.base_lin_vel[:, 0])
+        # print("torch.exp(-lin_vel_error / self.cfg.rewards.tracking_sigma)",torch.exp(-lin_vel_error / self.cfg.rewards.tracking_sigma))
         return torch.exp(-lin_vel_error / self.cfg.rewards.tracking_sigma)
 
     def _reward_tracking_lin_vel_enhance(self):

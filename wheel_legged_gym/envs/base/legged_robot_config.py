@@ -98,11 +98,11 @@ class LeggedRobotCfg(BaseConfig):
         class ranges:
             lin_vel_x = [-1.0, 1.0]  # min max [m/s]
             ang_vel_yaw = [-3.14, 3.14]  # min max [rad/s]
-            height = [0.1, 0.25]
+            height = [0.3, 0.5]
             heading = [-3.14, 3.14]
 
     class init_state:
-        pos = [0.0, 0.0, 1.0]  # x,y,z [m]
+        pos = [0.0, 0.0, 0.4]  # x,y,z [m]
         rot = [0.0, 0.0, 0.0, 1.0]  # x,y,z,w [quat]
         lin_vel = [0.0, 0.0, 0.0]  # x,y,z [m/s]
         ang_vel = [0.0, 0.0, 0.0]  # x,y,z [rad/s]
@@ -137,7 +137,7 @@ class LeggedRobotCfg(BaseConfig):
         self_collisions = 0  # 1 to disable, 0 to enable...bitwise filter
         replace_cylinder_with_capsule = True  # replace collision cylinders with capsules, leads to faster/more stable simulation
         flip_visual_attachments = (
-            True  # Some .obj meshes must be flipped from y-up to z-up
+            False  # Some .obj meshes must be flipped from y-up to z-up
         )
 
         density = 0.001
@@ -145,7 +145,7 @@ class LeggedRobotCfg(BaseConfig):
         linear_damping = 0.0
         max_angular_velocity = 1000.0
         max_linear_velocity = 1000.0
-        armature = 0.0
+        armature = 0.01
         thickness = 0.01
 
     class domain_rand:
@@ -159,7 +159,7 @@ class LeggedRobotCfg(BaseConfig):
         randomize_inertia_range = [0.8, 1.2]
         randomize_base_com = True
         rand_com_vec = [0.05, 0.05, 0.05]
-        push_robots = True
+        push_robots = False
         push_interval_s = 7
         max_push_vel_xy = 2.0
         randomize_Kp = True
@@ -175,15 +175,15 @@ class LeggedRobotCfg(BaseConfig):
 
     class rewards:
         class scales:
-            tracking_lin_vel = 1.0
+            tracking_lin_vel = 1
             tracking_lin_vel_enhance = 1
             tracking_ang_vel = 1.0
 
-            base_height = 1.0
+            base_height = 0.2
             nominal_state = -0.1
             lin_vel_z = -2.0
             ang_vel_xy = -0.05
-            orientation = -10.0
+            orientation = -20.0
 
             dof_vel = -5e-5
             dof_acc = -2.5e-7
@@ -202,7 +202,7 @@ class LeggedRobotCfg(BaseConfig):
         )
         soft_dof_vel_limit = 1.0
         soft_torque_limit = 1.0
-        base_height_target = 0.18
+        base_height_target = 0.45
         max_contact_force = 100.0  # forces above this value are penalized
 
     class normalization:
@@ -240,6 +240,7 @@ class LeggedRobotCfg(BaseConfig):
         dt = 0.005
         substeps = 1
         gravity = [0.0, 0.0, -9.81]  # [m/s^2]
+        # gravity = [0.0, -1, -9.81]  # [m/s^2]
         up_axis = 1  # 0 is y, 1 is z
 
         class physx:
@@ -298,7 +299,7 @@ class LeggedRobotCfgPPO(BaseConfig):
         )
         algorithm_class_name = "PPO"
         num_steps_per_env = 48  # per iteration
-        max_iterations = 5000  # number of policy updates
+        max_iterations = 2000  # number of policy updates
 
         # logging
         save_interval = 100  # check for potential saves every this many iterations

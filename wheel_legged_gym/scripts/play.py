@@ -45,14 +45,14 @@ def play(args):
     # override some parameters for testing
     env_cfg.env.episode_length_s = 20
     env_cfg.env.fail_to_terminal_time_s = 3
-    env_cfg.env.num_envs = min(env_cfg.env.num_envs, 50)
+    env_cfg.env.num_envs = min(env_cfg.env.num_envs, 1)
     env_cfg.terrain.num_rows = 5
     env_cfg.terrain.num_cols = 10
     env_cfg.terrain.max_init_terrain_level = env_cfg.terrain.num_rows - 1
     env_cfg.terrain.curriculum = True
     env_cfg.noise.add_noise = False
-    env_cfg.domain_rand.randomize_friction = False
-    env_cfg.domain_rand.friction_range = [0.1, 0.2]
+    env_cfg.domain_rand.randomize_friction = True
+    env_cfg.domain_rand.friction_range = [0.6, 0.6]
     env_cfg.domain_rand.randomize_restitution = False
     env_cfg.domain_rand.randomize_base_com = False
     env_cfg.domain_rand.push_robots = False
@@ -75,6 +75,20 @@ def play(args):
     ppo_runner, train_cfg = task_registry.make_alg_runner(
         env=env, name=args.task, args=args, train_cfg=train_cfg
     )
+    
+
+    # export policy as a jit module (used to run it from C++)
+    if EXPORT_POLICY:
+        path = os.path.join(
+            WHEEL_LEGGED_GYM_ROOT_DIR,
+            "logs",
+            train_cfg.runner.experiment_name,
+            "exported",
+            "policies",
+        )
+        export_policy_as_jit(ppo_runner.alg.actor_critic, path)
+        print("Exported policy as jit script to: ", path)
+
     # policy = ppo_runner.get_inference_policy(device=env.device)
     model_path = os.path.join(
             WHEEL_LEGGED_GYM_ROOT_DIR,
@@ -91,20 +105,8 @@ def play(args):
     policy_model_2 = torch.jit.load(policy_path_2).to(env.device)
     policy_model_2.eval()
 
-    # export policy as a jit module (used to run it from C++)
-    if EXPORT_POLICY:
-        path = os.path.join(
-            WHEEL_LEGGED_GYM_ROOT_DIR,
-            "logs",
-            train_cfg.runner.experiment_name,
-            "exported",
-            "policies",
-        )
-        export_policy_as_jit(ppo_runner.alg.actor_critic, path)
-        print("Exported policy as jit script to: ", path)
-
     logger = Logger(env.dt)
-    robot_index = 21  # which robot is used for logging
+    robot_index = 0  # which robot is used for logging
     joint_index = 1  # which joint is used for logging
     stop_state_log = 1000  # number of steps before plotting states
     stop_rew_log = (
@@ -122,7 +124,7 @@ def play(args):
     for i in range(1000 * int(env.max_episode_length)):
         if ppo_runner.alg.actor_critic.is_sequence:
             # print("obs_history:", obs_history[0,:])
-            print("obs:", obs[0,:])
+            # print("obs:", obs[0,:])
             obs_history = obs_history.to(env.device)
             latent = policy_model_2(obs_history)
             input = torch.cat((obs, latent), dim=-1)
@@ -132,13 +134,13 @@ def play(args):
             # print("latent:", latent[0,:]/2)
         else:
             actions = policy_model_1(obs.detach())
-        env.commands[:, 0] = 2.5
-        env.commands[:, 2] = 0.18  # + 0.07 * np.sin(i * 0.01)
+        env.commands[:, 0] = 0
+        env.commands[:, 2] = 0.4 # + 0.07 * np.sin(i * 0.01)
         env.commands[:, 3] = 0.0
 
         if CoM_offset_compensate:
-            if i > 0 and i < 2000:
-                vel_cmd[:] = 2.5 * np.clip((i - 200) * 0.05, 0, 1)
+            if i > 200 and i < 600:
+                vel_cmd[:] = 1 * np.clip((i - 200) * 0.05, 0, 1)
             else:
                 vel_cmd[:] = 0
             vel_err_intergral += (

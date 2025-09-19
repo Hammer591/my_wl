@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot name="main">
+    <link name="base_link">
+        <inertial>
+            <origin xyz="-0.067218 1.1041 0.082533" rpy="0 0 0" />
+            <mass value="9.25" />
+            <inertia ixx="0.028386" ixy="-5.7075E-06" ixz="-9.8079E-06" iyy="0.041168" iyz="1.3954E-06" izz="0.062197" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="../meshes/base_link.STL" />
+            </geometry>
+            <material name="">
+                <color rgba="0.75294 0.75294 0.75294 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="../meshes/base_link.STL" />
+            </geometry>
+        </collision>
+    </link>
+    
+    <!-- 左腿结构 -->
+    <joint name="lf0_Joint" type="revolute">
+        <origin xyz="-0.16273 -0.039204 0.88016" rpy="1.5708 0 0.095234" />
+        <parent link="base_link" />
+        <child link="lf0_Link" />
+        <axis xyz="0 1 0" />
+        <limit lower="-1.57" upper="1.57" effort="100" velocity="3.0"/>
+        <dynamics damping="0.1" friction="0"/>
+    </joint>
+    <link name="lf0_Link">
+        <inertial>
+            <origin xyz="-0.078475 0.018687 0.045086" rpy="0 0 0" />
+            <mass value="0.3131" />
+            <inertia ixx="0.00021536" ixy="-1.3936E-05" ixz="0.00024407" iyy="0.00070373" iyz="8.0063E-06" izz="0.00049996" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="../meshes/lf0_Link.STL" />
+            </geometry>
+            <material name="">
+                <color rgba="0.75294 0.75294 0.75294 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="../meshes/lf0_Link.STL" />
+            </geometry>
+        </collision>
+    </link>
+    
+    <joint name="lf1_Joint" type="revolute">
+        <origin xyz="-0.13006 0 0.074724" rpy="0 -0.055633 0" />
+        <parent link="lf0_Link" />
+        <child link="lf1_Link" />
+        <axis xyz="0 1 0" />
+        <limit lower="-1.57" upper="1.57" effort="100" velocity="3.0"/>
+        <dynamics damping="0.1" friction="0"/>
+    </joint>
+    <link name="lf1_Link">
+        <inertial>
+            <origin xyz="0.093195 0.00079988 0.08634" rpy="0 0 0" />
+            <mass value="0.3802" />
+            <inertia ixx="0.0019587" ixy="2.6727E-05" ixz="-0.0019591" iyy="0.0042067" iyz="2.4761E-05" izz="0.0022584" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="../meshes/lf1_Link.STL" />
+            </geometry>
+            <material name="">
+                <color rgba="0.75294 0.75294 0.75294 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="../meshes/lf1_Link.STL" />
+            </geometry>
+        </collision>
+    </link>
+    
+    <joint name="l_wheel_Joint" type="continuous">
+        <origin xyz="0.22007 0 0.20388" rpy="0 -0.039601 0" />
+        <parent link="lf1_Link" />
+        <child link="l_wheel_Link" />
+        <axis xyz="0 -1 0" />
+        <limit effort="50" velocity="10.0"/>
+        <dynamics damping="0.05" friction="0"/>
+    </joint>
+    <link name="l_wheel_Link">
+        <inertial>
+            <origin xyz="2.1344E-14 0.034473 1.843E-14" rpy="0 0 0" />
+            <mass value="1.688" />
+            <inertia ixx="0.0004649" ixy="-6.7289E-20" ixz="-4.0709E-21" iyy="0.00071923" iyz="-2.7657E-19" izz="0.0004649" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="../meshes/l_wheel_Link.STL" />
+            </geometry>
+            <material name="">
+                <color rgba="0.75294 0.75294 0.75294 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="../meshes/l_wheel_Link.STL" />
+            </geometry>
+        </collision>
+    </link>
+    
+    <!-- 右腿结构 -->
+    <joint name="rf0_Joint" type="revolute">
+        <origin xyz="-0.16273 -0.039204 1.30716" rpy="-1.5708 0 1.16" />
+        <parent link="base_link" />
+        <child link="rf0_Link" />
+        <axis xyz="0 1 0" />
+        <limit lower="-1.57" upper="1.57" effort="100" velocity="3.0"/>
+        <dynamics damping="0.1" friction="0"/>
+    </joint>
+    <link name="rf0_Link">
+        <inertial>
+            <origin xyz="-0.078475 -0.0026859 0.045086" rpy="0 0 0" />
+            <mass value="0.3131" />
+            <inertia ixx="0.00021536" ixy="-1.3936E-05" ixz="0.00024407" iyy="0.00070373" iyz="8.0063E-06" izz="0.00049996" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="../meshes/rf0_Link.STL" />
+            </geometry>
+            <material name="">
+                <color rgba="0.75294 0.75294 0.75294 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="../meshes/rf0_Link.STL" />
+            </geometry>
+        </collision>
+    </link>
+    
+    <joint name="rf1_Joint" type="revolute">
+        <origin xyz="-0.13006 -0.01 0.074724" rpy="0 -0.55633 0" />
+        <parent link="rf0_Link" />
+        <child link="rf1_Link" />
+        <axis xyz="0 1 0" />
+        <limit lower="-1.57" upper="1.57" effort="100" velocity="3.0"/>
+        <dynamics damping="0.1" friction="0"/>
+    </joint>
+    <link name="rf1_Link">
+        <inertial>
+            <origin xyz="-0.12688 -0.0018226 -0.11754" rpy="0 0 0" />
+            <mass value="0.3802" />
+            <inertia ixx="0.0019587" ixy="2.6727E-05" ixz="-0.0019591" iyy="0.0042067" iyz="2.4761E-05" izz="0.0022584" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="../meshes/rf1_Link.STL" />
+            </geometry>
+            <material name="">
+                <color rgba="0.75294 0.75294 0.75294 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="../meshes/rf1_Link.STL" />
+            </geometry>
+        </collision>
+    </link>
+    
+    <joint name="r_wheel_Joint" type="continuous">
+        <origin xyz="-0.22007 0 -0.20388" rpy="0 -0.039601 3.14" />
+        <parent link="rf1_Link" />
+        <child link="r_wheel_Link" />
+        <axis xyz="0 1 0" />
+        <limit effort="50" velocity="10.0"/>
+        <dynamics damping="0.05" friction="0"/>
+    </joint>
+    <link name="r_wheel_Link">
+        <inertial>
+            <origin xyz="1.8978E-14 -0.03185 1.8707E-14" rpy="0 0 0" />
+            <mass value="1.688" />
+            <inertia ixx="0.0004649" ixy="-6.7878E-20" ixz="5.4967E-21" iyy="0.00071923" iyz="-2.9606E-19" izz="0.0004649" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="../meshes/r_wheel_Link.STL" />
+            </geometry>
+            <material name="">
+                <color rgba="0.75294 0.75294 0.75294 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="../meshes/r_wheel_Link.STL" />
+            </geometry>
+        </collision>
+    </link>
+</robot>

@@ -16,7 +16,7 @@ Related Links:
    - Download and install Isaac Gym Preview 4 from https://developer.nvidia.com/isaac-gym
    - `cd isaacgym/python && pip install -e .`
    - Try running an example `cd examples && python 1080_balls_of_solitude.py`
-   - For troubleshooting check docs `isaacgym/docs/index.html`)
+   - For troubleshooting check docs `isaacgym/docs/index.html`
 4. Install wheel_legged_gym
     - Clone this repository
    - `cd Wheel-Legged-Gym && pip install -e .`

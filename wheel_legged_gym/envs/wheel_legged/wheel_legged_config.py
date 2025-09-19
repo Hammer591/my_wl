@@ -37,13 +37,13 @@ from wheel_legged_gym.envs.base.legged_robot_config import (
 class WheelLeggedCfg(LeggedRobotCfg):
 
     class init_state(LeggedRobotCfg.init_state):
-        pos = [0.0, 0.0, 0.25]  # x,y,z [m]
+        pos = [0.0, 0.0, 0.4]  # x,y,z [m]
         default_joint_angles = {  # target angles when action = 0.0
-            "lf0_Joint": 0.5,
-            "lf1_Joint": 0.35,
+            "lf0_Joint": 0.0,
+            "lf1_Joint": 0.0,
             "l_wheel_Joint": 0.0,
-            "rf0_Joint": -0.5,
-            "rf1_Joint": -0.35,
+            "rf0_Joint": -0.0,
+            "rf1_Joint": -0.0,
             "r_wheel_Joint": 0.0,
         }
 

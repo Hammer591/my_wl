@@ -154,10 +154,10 @@ class LeggedRobotVMC(LeggedRobot):
 
         self.L0, self.theta0 = self.forward_kinematics(self.theta1, self.theta2)
 
-        print("self.theta1", self.theta1[0,:])
-        print("self.theta2", self.theta2[0,:])
-        print("self.L0", self.L0[0,:])
-        print("self.theta0", self.theta0[0,:])
+        # print("self.theta1", self.theta1[0,:])
+        # print("self.theta2", self.theta2[0,:])
+        # print("self.L0", self.L0[0,:])
+        # print("self.theta0", self.theta0[0,:])
 
         dt = 0.001
         L0_temp, theta0_temp = self.forward_kinematics(
@@ -280,7 +280,7 @@ class LeggedRobotVMC(LeggedRobot):
             ),
             dim=-1,
         )
-        print("base_quat", self.base_quat[0,:])
+        # print("base_quat", self.base_quat[0,:])
         # print("obs_buf", obs_buf[0,:])
         return obs_buf
 
@@ -394,7 +394,7 @@ class LeggedRobotVMC(LeggedRobot):
             ),
             axis=1,
         )
-        print("torques", torques[0,:])
+        # print("torques", torques[0,:])
 
         return torch.clip(
             torques * self.torques_scale, -self.torque_limits, self.torque_limits

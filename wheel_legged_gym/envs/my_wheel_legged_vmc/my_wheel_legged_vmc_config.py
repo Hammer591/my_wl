@@ -16,8 +16,8 @@ class MyWheelLeggedVMCCfg(MyWheelLeggedCfg):
         action_scale_l0 = 0.1
         action_scale_vel = 10.0
 
-        l0_offset = 0.175
-        feedforward_force = 40.0  # [N]
+        l0_offset = 0.32
+        feedforward_force = 20.0  # [N]
 
         kp_theta = 50.0  # [N*m/rad]
         kd_theta = 3.0  # [N*m*s/rad]
@@ -49,4 +49,4 @@ class MyWheelLeggedVMCCfgPPO(MyWheelLeggedCfgPPO):
     class runner(MyWheelLeggedCfgPPO.runner):
         # logging
         experiment_name = "my_wheel_legged_vmc"
-        max_iterations = 1000
+        max_iterations = 2000
