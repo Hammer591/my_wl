@@ -850,19 +850,29 @@ class LeggedRobot(BaseTask):
                 -self.cfg.commands.advanced_max_curriculum,
                 self.cfg.commands.advanced_max_curriculum,
             )
+        # print("self.cfg.terrain.curriculum",self.cfg.terrain.curriculum)
         if self.cfg.terrain.curriculum == False:
             # print(self.episode_sums["tracking_lin_vel"][0])
             # print(self.episode_sums["tracking_ang_vel"][0])
+            # print("11111",torch.mean(self.episode_sums["tracking_lin_vel"][env_ids])
+            #     / self.max_episode_length
+            #     - self.cfg.commands.curriculum_threshold
+            #     * self.reward_scales["tracking_lin_vel"])
+            # print("22222",torch.mean(self.episode_sums["tracking_ang_vel"][env_ids])
+            #     / self.max_episode_length
+            #     - self.cfg.commands.curriculum_threshold
+            #     * self.reward_scales["tracking_ang_vel"]
+            #     * 0.8)
             if (
                 torch.mean(self.episode_sums["tracking_lin_vel"][env_ids])
                 / self.max_episode_length
                 > self.cfg.commands.curriculum_threshold
                 * self.reward_scales["tracking_lin_vel"]
-                and torch.mean(self.episode_sums["tracking_ang_vel"][env_ids])
-                / self.max_episode_length
-                > self.cfg.commands.curriculum_threshold
-                * self.reward_scales["tracking_ang_vel"]
-                * 0.8
+                # and torch.mean(self.episode_sums["tracking_ang_vel"][env_ids])
+                # / self.max_episode_length
+                # > self.cfg.commands.curriculum_threshold
+                # * self.reward_scales["tracking_ang_vel"]
+                # * 0.8
             ):
                 self.command_ranges["lin_vel_x"][:, 0] = torch.clip(
                     self.command_ranges["lin_vel_x"][:, 0] - 0.1,
@@ -1767,6 +1777,7 @@ class LeggedRobot(BaseTask):
     def _reward_tracking_ang_vel(self):
         # Tracking of angular velocity commands (yaw)
         ang_vel_error = torch.square(self.commands[:, 1] - self.base_ang_vel[:, 2])
+        # print("torch.exp(-ang_vel_error / self.cfg.rewards.tracking_sigma)",torch.exp(-ang_vel_error / self.cfg.rewards.tracking_sigma))
         return torch.exp(-ang_vel_error / self.cfg.rewards.tracking_sigma)
 
     def _reward_tracking_ang_vel_enhance(self):

@@ -175,11 +175,13 @@ class LeggedRobotCfg(BaseConfig):
 
     class rewards:
         class scales:
-            tracking_lin_vel = 1
+            tracking_lin_vel = 1.0
             tracking_lin_vel_enhance = 1
             tracking_ang_vel = 1.0
+            tracking_ang_vel_enhance = 1
 
             base_height = 0.2
+            base_height_enhance = 1.0
             nominal_state = -0.1
             lin_vel_z = -2.0
             ang_vel_xy = -0.05
@@ -188,8 +190,8 @@ class LeggedRobotCfg(BaseConfig):
             dof_vel = -5e-5
             dof_acc = -2.5e-7
             torques = -0.0001
-            action_rate = -0.01
-            action_smooth = -0.01
+            action_rate = -0.02
+            action_smooth = -0.02
 
             collision = -1.0
             dof_pos_limits = -1.0
@@ -240,7 +242,7 @@ class LeggedRobotCfg(BaseConfig):
         dt = 0.005
         substeps = 1
         gravity = [0.0, 0.0, -9.81]  # [m/s^2]
-        # gravity = [0.0, -1, -9.81]  # [m/s^2]
+        # gravity = [0.0, 0.0, -0.5]  # [m/s^2]
         up_axis = 1  # 0 is y, 1 is z
 
         class physx:

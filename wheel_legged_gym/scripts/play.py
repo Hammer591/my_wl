@@ -135,12 +135,15 @@ def play(args):
         else:
             actions = policy_model_1(obs.detach())
         env.commands[:, 0] = 0
-        env.commands[:, 2] = 0.4 # + 0.07 * np.sin(i * 0.01)
+        env.commands[:, 2] = 0.40 # + 0.07 * np.sin(i * 0.01)
         env.commands[:, 3] = 0.0
 
         if CoM_offset_compensate:
             if i > 200 and i < 600:
-                vel_cmd[:] = 1 * np.clip((i - 200) * 0.05, 0, 1)
+                vel_cmd[:] = 1 * np.clip((i - 200) * 0.01, 0, 1)
+                # vel_cmd[:] = 1.0
+            elif i > 600 and i < 1000:
+                vel_cmd[:] = 1 * np.clip((1000 - i) * 0.01, 0, 1)
             else:
                 vel_cmd[:] = 0
             vel_err_intergral += (
