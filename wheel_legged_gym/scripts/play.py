@@ -135,7 +135,7 @@ def play(args):
         else:
             actions = policy_model_1(obs.detach())
         env.commands[:, 0] = 0
-        env.commands[:, 2] = 0.40 # + 0.07 * np.sin(i * 0.01)
+        env.commands[:, 2] = 0.35 + 0.05 * np.sin(i * 0.01)
         env.commands[:, 3] = 0.0
 
         if CoM_offset_compensate:
